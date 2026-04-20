@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Support Tickets | United Mortgage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+  <div class="header-inner">
+
+    <div class="logo">
+      <img src="../assets/logo.webp" alt="United Mortgage">
+      <span>United Mortgage</span>
+    </div>
+
+    <nav class="nav-buttons">
+      <a href="../index.html" class="nav-btn">Home</a>
+      <a href="../branches.html" class="nav-btn">Branches</a>
+      <a href="index.html" class="nav-btn active">Tickets</a>
+    </nav>
+
+  </div>
+</header>
+
+<!-- CONTENT -->
+<section class="section">
+
+  <!-- FORM HEADER -->
+  <div class="ticket-header">
+    <h2>Submit a Support Ticket</h2>
+    <p>Our team will contact you as soon as possible.</p>
+  </div>
+
+  <!-- FORM -->
+  <form id="ticketForm" class="ticket-form">
+
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" placeholder="John Doe" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="you@email.com" required>
+    </div>
+
+    <div class="form-group">
+      <label for="department">Department</label>
+      <select id="department" name="department" required>
+        <option value="">Select department</option>
+        <option value="IT">IT</option>
+        <option value="Compliance">Compliance</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Support">Support</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea
+        id="message"
+        name="message"
+        rows="5"
+        placeholder="Describe your issue or question..."
+        required></textarea>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      Submit Ticket
+    </button>
+
+    <p id="successMsg" class="success-msg"></p>
+
+  </form>
+
+</section>
+
+<!-- JS -->
+<script src="js/tickets.js"></script>
+
+</body>
+</html>

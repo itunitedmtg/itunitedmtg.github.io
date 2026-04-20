@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>State | United Mortgage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <strong>United Mortgage</strong>
+  </div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="branches.html">Branches</a>
+    <a href="#" class="apply-btn">Apply Now</a>
+  </nav>
+</header>
+
+<section class="section">
+  <h2 id="stateTitle">State</h2>
+  <p style="text-align:center;color:#6b7280">
+    Explore our branch owners in this state.
+  </p>
+
+  <div class="cards" id="branchList"></div>
+</section>
+
+<script>
+const branches = [
+  {
+    name: "Jessica Carlin",
+    city: "Miami",
+    state: "Florida",
+    url: "jessica-carlin/index.html"
+  },
+  {
+    name: "Orlando Branch",
+    city: "Orlando",
+    state: "Florida",
+    url: "#"
+  },
+  {
+    name: "Charlotte Branch",
+    city: "Charlotte",
+    state: "North Carolina",
+    url: "#"
+  }
+];
+
+const params = new URLSearchParams(window.location.search);
+const state = params.get("state");
+
+document.getElementById("stateTitle").innerText = state;
+
+const container = document.getElementById("branchList");
+
+branches
+  .filter(b => b.state === state)
+  .forEach(b => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <h3>${b.name}</h3>
+      <p>${b.city}, ${b.state}</p>
+      <a href="${b.url}" class="btn-primary">View Profile</a>
+    `;
+    container.appendChild(div);
+  });
+;
+</script>
+
+</body>
+</html>

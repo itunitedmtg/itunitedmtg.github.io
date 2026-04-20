@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aaron Marin | Branch Leader | United Mortgage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="aaron-page">
+
+<!-- HEADER -->
+<header class="reveal">
+  <div class="container header-content">
+    <a href="/index.html" class="logo">
+      <img src="https://img1.wsimg.com/isteam/ip/f6bd757c-6ed2-4b2b-8d79-6a09da1f70a0/PNG.png" alt="United Mortgage Logo">
+      <strong>United Mortgage</strong>
+    </a>
+
+    <nav>
+      <a href="#about">About</a>
+      <a href="/branches.html">Map</a>
+      <a href="#approach">Approach</a>
+      <a href="#contact" class="btn-primary">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero-lo reveal">
+  <div class="container hero-grid">
+
+    <!-- CONTENIDO -->
+    <div class="hero-content reveal">
+      <h1>Aaron Marin</h1>
+      <h2>Branch Leader • Huntersville, North Carolina • NMLS #2004657</h2>
+
+      <p>
+        Vision-driven leader focused on financial growth, strategic recruiting,
+        and building high-performing mortgage teams.
+      </p>
+
+      <div class="hero-actions">
+        <a href="tel:7045551234" class="btn-primary">Call 704-555-1234</a>
+        <a href="https://unitedmtg.my1003app.com/2004657/register" target="_blank" class="btn-outline">
+          Apply Online
+        </a>
+      </div>
+    </div>
+
+    <!-- IMAGEN -->
+    <div class="hero-image reveal">
+      <img src="assets/aaron_pagina.webp" alt="Aaron Marin">
+    </div>
+
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="trust-bar reveal">
+  <div class="container trust-grid">
+    <div class="reveal"><strong>📍 Location</strong><br>Huntersville, NC</div>
+    <div class="reveal"><strong>📞 Phone</strong><br>704-555-1234</div>
+    <div class="reveal"><strong>🚀 Focus</strong><br>Branch Growth</div>
+    <div class="reveal"><strong>⚡ Response</strong><br>24–48 Hours</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section reveal" id="about">
+  <div class="container about-grid">
+
+    <div class="reveal">
+      <h2>About Aaron</h2>
+      <p>
+        Aaron Marin is a results-driven branch leader known for his collaborative
+        decision-making style and calculated approach to growth.
+      </p>
+      <p>
+        He focuses on recruiting top talent, improving team performance,
+        and scaling sustainable mortgage operations.
+      </p>
+    </div>
+
+    <div class="about-cards">
+      <div class="about-card reveal">Visionary Leadership</div>
+      <div class="about-card reveal">Strategic Recruiting</div>
+      <div class="about-card reveal">Growth-Focused</div>
+      <div class="about-card reveal">Team Builder</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- APPROACH -->
+<section class="section alt reveal" id="approach">
+  <div class="container">
+    <h2 class="reveal">Leadership Approach</h2>
+
+    <div class="cards">
+      <div class="card reveal">
+        <h3>Decision Style</h3>
+        <p>Collaborative decisions involving key stakeholders.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3>Marketing Focus</h3>
+        <p>Digital growth strategies and relationship-driven marketing.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3>Client Strategy</h3>
+        <p>Transaction-focused approach with a long-term vision.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta reveal" id="contact">
+  <h2>Interested in Joining Aaron’s Branch?</h2>
+  <p>Let’s talk about growth opportunities at United Mortgage.</p>
+  <a href="tel:7045551234" class="btn-primary">Contact Aaron</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="reveal">
+  <p>
+    United Mortgage of America, LLC • NMLS #2591834<br>
+    Equal Housing Opportunity
+  </p>
+</footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("active");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document
+    .querySelectorAll("body.aaron-page .reveal")
+    .forEach(el => observer.observe(el));
+});
+</script>
+
+
+</body>
+</html>
+

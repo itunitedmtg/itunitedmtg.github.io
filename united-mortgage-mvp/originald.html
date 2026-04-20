@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Branch Sales Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{--bg:#ffffff;--panel:#f7f9fc;--stroke:#e7eef6;--ink:#101828;--muted:#5f6c7b;--accent:#146ef5;--accent-2:#7c3aed;--ok:#22c55e;--ok-strong:#16a34a;--warn:#f59e0b;--bad:#ef4444;--ai:#0ea5e9;--brooke:#22c55e;--inhouse:#10b981;}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
+    .wrap{max-width:1920px;width:100%;margin:0 auto;padding:12px 16px}
+    .hdr{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding-top:4px;position:relative}
+    .hdr-left{display:flex;align-items:center;gap:8px;justify-content:flex-start}
+    .hdr-center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    .hdr-right{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+    h1{font-size:24px;margin:0}
+    .sub{color:#667085;font-size:12px;margin-top:2px}
+    .logo{height:26px;width:auto;object-fit:contain;display:block}
+    .btn{background:#fff;color:#344054;border:1px solid var(--stroke);padding:6px 9px;border-radius:10px;font-weight:600;cursor:pointer;font-size:11px;transition:all .2s ease}
+    .btn:hover{background:#f9fafb;border-color:#d0d5dd}
+    .btn:active{transform:translateY(1px)}
+    .btn-icon{width:32px;padding:6px 0;text-align:center}
+    .live{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em;color:#064e3b;background:#e8f7ee;border:1px solid #cdebd8;user-select:none}
+    .dot{width:9px;height:9px;border-radius:999px;background:var(--ok);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulse 1.8s ease-in-out infinite}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6);background:var(--ok)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0);background:var(--ok-strong)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0);background:var(--ok)}}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:14px;margin-top:14px;align-items:stretch;}
+
+    @media(max-width:1200px){.grid{grid-template-columns:1fr}}
+    .panel{background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:14px;display:flex;flex-direction:column;height:100%}
+    .panel h2{margin:0 0 10px;font-size:14px}
+    .hrow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .hdrDate{font-size:12px;color:#667085}
+    .stack{display:flex;flex-direction:column;gap:12px;flex:1;justify-content:flex-start;}
+    .card{background:#fff;border:1px solid var(--stroke);border-radius:12px;padding:10px}
+    .execs{display:flex;flex-direction:column;gap:10px}
+    .exec .head{display:flex;justify-content:space-between;align-items:center}
+    .person{display:flex;align-items:center;gap:8px}
+    .avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:#eef2ff;border:1px solid var(--stroke);font-size:12px;font-weight:700;color:#334155}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .badge{font-size:11px;padding:3px 8px;border-radius:999px;background:#ffffff;color:#065f46;border:1px solid #bbf7d0;box-shadow:0 0 0 0 rgba(16,185,129,.28);animation:badgeGlow 2.2s ease-in-out infinite}
+    @keyframes badgeGlow{0%{box-shadow:0 0 0 0 rgba(16,185,129,.28)}70%{box-shadow:0 0 0 10px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .metrics.metrics-two{grid-template-columns:repeat(2,1fr)}
+    .metric{background:#f8fafc;border:1px solid var(--stroke);border-radius:10px;padding:6px 8px;height:52px;display:flex;flex-direction:column;justify-content:center}
+    .metric small{color:#667085;font-size:11px;display:block;text-align:center}
+    .metric .num{font-size:16px;font-weight:800;display:block;text-align:center;margin-top:2px;color:var(--ink)}
+    .overallProgress{margin-top:8px}
+    .overallProgress-label{display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:4px}
+    .overallProgress-bar{width:100%;height:8px;border-radius:999px;background:#e5e7eb;border:1px solid var(--stroke);overflow:hidden}
+    .overallProgress-bar span{display:block;height:100%;background:var(--accent-2)}
+    .goal{background:#fff;border:1px solid var(--stroke);border-radius:12px;padding:12px}
+    .goal .top{display:flex;justify-content:space-between;align-items:center}
+    .goal .chip{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--stroke);background:#f9fafb;color:#475467}
+    .bigBranches{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px}
+    .bigBranches-num{font-size:34px;font-weight:800;letter-spacing:.03em;animation:blinkSoft 1.6s ease-in-out infinite;text-align:center}
+    @keyframes blinkSoft{0%,100%{opacity:1}50%{opacity:.4}}
+    .bigBranches-bar{width:100%;height:12px;border-radius:999px;background:#eef2f7;border:1px solid var(--stroke);overflow:hidden}
+    .bigBranches-bar span{display:block;height:100%;background:var(--accent)}
+    .mini-breakdown{display:flex;justify-content:center;gap:12px;margin-top:8px;font-size:11px;color:#64748b}
+    .mini-bd-item{display:flex;align-items:center;gap:4px}
+    .mini-bd-dot{width:6px;height:6px;border-radius:50%}
+    .pieRow{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:10px;flex-wrap:wrap}
+    .pieWrap{flex:1;max-width:120px;text-align:center;position:relative}
+    .pieWrap canvas{width:100%;max-width:120px;height:auto}
+    .pieLabel{font-size:11px;color:#64748b;margin-top:4px;line-height:1.3}
+    .pieLabel .pieSub{display:block;font-size:10px;color:#94a3b8}
+    .fill{display:flex;flex-direction:column;flex:1}
+    .empty{color:#98a2b3;font-size:12px;text-align:left;padding:10px;border:1px dashed var(--stroke);border-radius:10px;background:#fff;min-height:260px;display:none;white-space:pre-line}
+    .list{min-height:260px;max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+    .note{display:flex;gap:8px;background:#fff;border:1px solid var(--stroke);border-left:4px solid var(--accent);padding:8px;border-radius:10px;align-items:center;font-size:12px;transition:transform .1s ease,box-shadow .1s ease}
+    .note:hover{transform:translateY(-1px);box-shadow:0 2px 5px rgba(0,0,0,.05)}
+    .note-main{display:flex;flex-direction:row;flex-wrap:wrap;gap:4px;align-items:center;flex:1}
+    .note-main a,.note-name{font-weight:600;color:#111827;text-decoration:none}
+    .note-main a:hover{text-decoration:underline}
+    .note-phone{font-size:11px;color:#4b5563}
+    .ts{font-variant-numeric:tabular-nums;color:#98a2b3;font-size:11px;margin-left:auto}
+    .note-type{font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:999px;background:#eef2ff;color:#475467;white-space:nowrap}
+    .mapSection{display:flex;flex-direction:column;flex:1}
+    .mapbox{background:#fff;border:1px solid var(--stroke);border-radius:12px;padding:10px;display:flex;flex-direction:column;flex:1}
+    #leafletMap{flex:1;min-height:260px;border-radius:10px;overflow:hidden}
+    .ticker{margin-top:8px;border:1px solid var(--stroke);background:#fff;border-radius:10px;height:26px;overflow:hidden;display:flex;align-items:center;position:relative}
+    .ticker .stage{position:relative;width:100%;height:100%;overflow:hidden}
+    .ticker .slide{position:absolute;top:0;height:100%;display:flex;align-items:center;white-space:nowrap;padding:0 12px;font-size:13px;color:#344054;will-change:transform}
+    #celebrate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999;pointer-events:none}
+    #celebrate.show{display:flex!important;animation:fwFade .2s ease-out both}
+    @keyframes fwFade{from{opacity:0}to{opacity:1}}
+    #fwCanvas{position:absolute;inset:0}
+    #fwMessage{position:relative;padding:18px 22px;border-radius:14px;font-weight:800;font-size:24px;color:#052e16;background:rgba(236,252,203,.95);border:1px solid #d9f99d;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+    #fwTitle{font-size:24px;font-weight:800}
+    #fwSub{font-size:16px;font-weight:700;margin-top:4px;color:#14532d;text-align:center}
+    #historyOverlay{position:fixed;inset:0;background:rgba(15,23,42,.94);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9998}
+    #historyChrome{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;color:#e5e7eb;font-size:13px;font-weight:500}
+    #historyImage{max-width:96%;max-height:90%;border-radius:16px;box-shadow:0 25px 60px rgba(0,0,0,.5);background:#0f172a;border:1px solid rgba(148,163,184,.4)}
+    #toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:13px;display:none;z-index:10000}
+    #toast strong{font-weight:800}
+    #toast small{opacity:.85}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hdr">
+      <div class="hdr-left">
+        <img class="logo" id="umLogo" alt="United Mortgage" title="United Mortgage"
+             src="https://img1.wsimg.com/isteam/ip/f6bd757c-6ed2-4b2b-8d79-6a09da1f70a0/PNG.png/:/rs=w:478,h:158,cg=true,m/cr=w:478,h:158/qt=q:95">
+      </div>
+      <div class="hdr-center">
+        <h1>Branch Sales Dashboard</h1>
+        <div class="sub"><span id="clock"></span></div>
+      </div>
+      <div class="hdr-right">
+        <button class="btn btn-icon" id="btnPrevDay" title="View previous snapshot">◀</button>
+        <button class="btn btn-icon" id="btnNextDay" title="View next snapshot / back to live">▶</button>
+        <button class="btn" id="btnFull" title="Toggle full screen">Full Screen</button>
+        <span class="live" id="liveBadge"><span class="dot"></span> LIVE</span>
+      </div>
+    </header>
+    <div class="grid">
+      <div class="panel">
+        <div class="stack">
+          <div>
+            <div class="hrow">
+              <h2>Sales Team - Today</h2>
+              <div class="hdrDate" id="todayLabel"></div>
+            </div>
+            <div class="execs" id="execs"></div>
+          </div>
+          <div class="fill">
+            <h2>Today’s Presentations</h2>
+            <div class="empty" id="noticesEmpty">No presentations scheduled yet today.</div>
+            <div class="list" id="notices"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="hrow">
+          <h2>Sales Team - Weekly</h2>
+          <div class="hdrDate" id="dayRange"></div>
+        </div>
+        <div class="stack">
+          <div class="goal">
+            <div class="top">
+              <strong>Jose Vargas</strong>
+            </div>
+            <div class="pieRow">
+              <div class="pieWrap">
+                <canvas id="joseCallsPie"></canvas>
+                <div class="pieLabel">Weekly Calls<br><span class="pieSub">Goal 1500</span></div>
+              </div>
+              <div class="pieWrap">
+                <canvas id="josePresPie"></canvas>
+                <div class="pieLabel">Weekly Presentations<br><span class="pieSub">Goal 35</span></div>
+              </div>
+            </div>
+          </div>
+         
+          <div class="goal">
+            <div class="top">
+              <strong>AI Agent</strong>
+            </div>
+            <div class="pieRow">
+              <div class="pieWrap">
+                <canvas id="aiCallsPie"></canvas>
+                <div class="pieLabel">Calls Made</div>
+              </div>
+              <div class="pieWrap">
+                <canvas id="aiVmPie"></canvas>
+                <div class="pieLabel">Voicemails Dropped</div>
+              </div>
+              <div class="pieWrap">
+                <canvas id="aiSmsPie"></canvas>
+                <div class="pieLabel">Texts / SMS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="hrow">
+          <h2>Sales Team - Monthly</h2>
+          <div class="hdrDate" id="monthColHead"></div>
+        </div>
+        <div class="stack">
+          <div class="goal">
+            <div class="top">
+              <strong>Branches Sold</strong>
+              <span class="chip">Monthly Goal: 12</span>
+            </div>
+            <div id="mtdBars"></div>
+          </div>
+          <div class="mapSection">
+            <h2 style="margin-top:2px" id="mapTitle">Active Branches</h2>
+            <div class="mapbox">
+              <div id="leafletMap"></div>
+              <div class="ticker">
+                <div class="stage" id="tickerStage">
+                  <div class="slide" id="branchSlide"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="celebrate">
+      <canvas id="fwCanvas"></canvas>
+      <div id="fwMessage">
+        <div id="fwTitle">🎉 Branch Sold!</div>
+        <div id="fwSub"></div>
+      </div>
+    </div>
+    <div id="historyOverlay">
+      <div id="historyChrome">
+        <span id="historyLabel"></span>
+        <button class="btn" id="historyCloseBtn">Close</button>
+      </div>
+      <img id="historyImage" alt="Dashboard snapshot history">
+    </div>
+  </div>
+  <div id="toast"></div>
+<script>
+
+  const doughnutTextPlugin = {
+    id: 'doughnutText',
+    afterDraw: function(chart) {
+      if (chart.config.type !== 'doughnut') return;
+      const current = chart.data.datasets[0].data[0];
+      const remaining = chart.data.datasets[0].data[1];
+      const goal = current + remaining;
+      const isGoalChart = chart.canvas.id.includes('jose') || chart.canvas.id.includes('brooke');
+      const ctx = chart.ctx;
+      const width = chart.width;
+      const height = chart.height;
+      ctx.restore();
+      const fontSize = (height / 114).toFixed(2);
+      ctx.font = "bold " + fontSize + "em Inter";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = chart.data.datasets[0].backgroundColor[0];
+      let text;
+      if (isGoalChart && goal > 0 && remaining > 0) {
+        const percent = Math.max(0, Math.min(100, Math.round((current / goal) * 100)));
+        text = percent + "%";
+      } else {
+        text = current.toLocaleString();
+      }
+      const textX = Math.round((width - ctx.measureText(text).width) / 2);
+      const textY = height / 2;
+      ctx.fillText(text, textX, textY);
+      ctx.save();
+    }
+  };
+  Chart.register(doughnutTextPlugin);
+ 
+  const BASE_URI = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTf_iwjdub9Xqxyi8Ypu5tcRXcrOO5svViTnG9bniaGhwCmAl0riB2MW0BqCo77stX6kBImayU3cDRW/pub';
+  const SHEETS = {
+    joseCalls: { csv: `${BASE_URI}?gid=0&single=true&output=csv` },
+    aiCalls:   { csv: `${BASE_URI}?gid=140770358&single=true&output=csv` },
+    dailySMS:  { csv: `${BASE_URI}?gid=1662792329&single=true&output=csv` },
+    pipeline:  { csv: `${BASE_URI}?gid=1119253838&single=true&output=csv` }, // Daily Stages
+    historyPipeline: { csv: `${BASE_URI}?gid=1502832145&single=true&output=csv` } // History Stages
+  };
+  const JOSE_DAILY_CALL_GOAL = 200;
+  const JOSE_DAILY_PRES_GOAL = 7;
+  const EDUARDO_DAILY_CALL_GOAL = 200;
+  const EDUARDO_DAILY_PRES_GOAL = 7;
+  const clockEl = document.getElementById('clock');
+  function tickClock(){const d = new Date();const date = d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric', year:'numeric'});const time = d.toLocaleTimeString(undefined,{hour:'2-digit', minute:'2-digit', second:'2-digit'});clockEl.textContent = `${date} • ${time}`;}
+  tickClock(); setInterval(tickClock, 1000);
+  document.getElementById('monthColHead').textContent = new Date().toLocaleString(undefined,{month:'long', year:'numeric'});
+  const todayLabelEl = document.getElementById('todayLabel');
+  const dayRangeEl = document.getElementById('dayRange');
+  function updateDateLabels(){const now = new Date();todayLabelEl.textContent = now.toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric', year:'numeric'});const d = new Date();const day = d.getDay();const diffToMonday = (day === 0 ? -6 : 1 - day);const monday = new Date(d); monday.setDate(d.getDate()+diffToMonday);const friday = new Date(monday); friday.setDate(monday.getDate()+4);const fmt = new Intl.DateTimeFormat(undefined,{month:'short', day:'numeric'});dayRangeEl.textContent = `${fmt.format(monday)} – ${fmt.format(friday)}`;}
+  updateDateLabels();
+  const today = new Date();
+  function startOfToday(){const d=new Date();d.setHours(0,0,0,0);return d;}
+  function endOfToday(){const d=startOfToday();d.setDate(d.getDate()+1);return d;}
+  const SOT = startOfToday(), EOT = endOfToday();
+  const normKey = k => String(k||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+  const normAgentName=s=>String(s||'').trim().toLowerCase();
+  const AGENT_CANON=new Map([['ai agent','AI Agent'], ['ai','AI Agent'], ['retail ai','AI Agent'], ['retell ai','AI Agent'],['brooke marin','Brooke Marin'], ['brooke maren','Brooke Marin'], ['brooke barron','Brooke Marin'], ['brooke','Brooke Marin'], ['brooke m','Brooke Marin'],['jose vargas','Jose Vargas'], ['jose chaves','Jose Vargas'], ['jose chavez','Jose Vargas'], ['jose c','Jose Vargas'], ['chaves','Jose Vargas'], ['chavez','Jose Vargas'], ['j chaves','Jose Vargas'], ['j chavez','Jose Vargas'], ['j vargas','Jose Vargas']]);
+  function toCanonicalAgent(raw){const n=normAgentName(raw||'');return AGENT_CANON.get(n)|| (n.includes('brooke') ? 'Brooke Marin': (n.includes('jose')||n.includes('vargas') ? 'Jose Vargas': (n.includes('ai') ? 'AI Agent': (String(raw||'').trim()))));}
+  const parseDurationToSec = v=>{if(v==null) return 0;const s=String(v).trim();if(/^\d+$/.test(s)) return Number(s);const p=s.split(':').map(Number);if(p.length===3) return p[0]*3600+p[1]*60+p[2];if(p.length===2) return p[0]*60+p[1];return 0;};
+  function toDateOrNull(v){if (v==null || v==='') return null;const s=String(v).trim();const parsed=Date.parse(s);if(!Number.isNaN(parsed)) return new Date(parsed);const n=Number(s);if(!Number.isFinite(n)) return null;if(n>1e12) return new Date(n);if(n>1e9 && n<1e12) return new Date(n*1000);if(n>20000 && n<70000){return new Date((n-25569)*86400*1000);}return null;}
+  function parseCSV(text){const out=[];let i=0,f='',row=[],q=false;const push=()=>{row.push(f);f='';};const pushRow=()=>{out.push(row);row=[];};while(i<text.length){const c=text[i];if(q){if(c=='"'){if(text[i+1]=='"'){f+='"';i+=2;continue;}q=false;i++;continue;}f+=c;i++;continue;}if(c=='"'){q=true;i++;continue;}if(c===','){push();i++;continue;}if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n') i++;push();pushRow();i++;continue;}f+=c;i++;}push();pushRow();while(out.length&&out[out.length-1].every(v=>String(v).trim()==='')) out.pop();return out;}
+  function toCanonicalAgent(name = '') {
+  const n = String(name).toLowerCase().trim();
+
+  if (n.includes('jose')) return 'Jose Vargas';
+  if (n.includes('eduardo')) return 'Eduardo Quesada';
+
+  return '';
+}
+
+  async function fetchSheetRows(sheet){try{const res = await fetch(sheet.csv, {cache:'no-store', credentials:'omit'});if(!res.ok) return [];const txt = await res.text();const grid = parseCSV(txt).filter(r=>r.some(v=>String(v).trim()!==''));if(!grid.length) return [];const headers = grid[0].map(h=>normKey(h));const rows=[];for(let r=1;r<grid.length;r++){const obj={};for(let c=0;c<headers.length;c++){obj[headers[c]||`col${c+1}`] = (grid[r][c]??'').toString().trim();}if(Object.values(obj).some(v=>v!=='')) rows.push(obj);}return rows;}catch(e){return [];}}
+  const state = {
+    execs:[
+      {name:'Jose Vargas', initials:'JV', avatar:'',callsConnected:0, callsNotConnected:0, voicemails:0,callsTransferred:0, appointmentsSet:0, presentationsCompletedToday:0, contractsSentToday:0, branchesSold:0,totalMin:0, totalCalls:0,presentationsCompletedWeekly:0, contractsSentWeekly:0, textMessages:0},
+      {
+  name: 'Eduardo Quesada',initials: 'EQ', avatar: '', callsConnected: 0,callsNotConnected: 0, voicemails: 0,callsTransferred: 0,appointmentsSet: 0, presentationsCompletedToday: 0,contractsSentToday: 0,branchesSold: 0,totalMin: 0, totalCalls: 0,presentationsCompletedWeekly: 0,contractsSentWeekly: 0,textMessages: 0},
+     
+      {name:'AI Agent', initials:'AI', avatar:'',callsConnected:0, callsNotConnected:0, voicemails:0,callsTransferred:0, appointmentsSet:0, presentationsCompletedToday:0, contractsSentToday:0, branchesSold:0,totalMin:0, totalCalls:0,presentationsCompletedWeekly:0, contractsSentWeekly:0, textMessages:0,emailsSent:0}
+    ],
+    notices:[],
+    calls:[],
+    month:{targetGoal:12,byExec:new Map(),prevByExec:new Map(),mtdTotal:0},
+    prev:{connections:new Map(),presentations:new Map(),sent:new Map()},
+    _prevClosedTotal: 0,
+    branches:[
+      {city:'Concord', state:'NC', lat:35.4088, lng:-80.5795},
+      {city:'Myrtle Beach', state:'SC', lat:33.6891, lng:-78.8867},
+      {city:'Miami', state:'FL', lat:25.7617, lng:-80.1918},
+      {city:'Bowie', state:'MD', lat:39.0068, lng:-76.7791},
+      {city:'Tampa', state:'FL', lat:27.9506, lng:-82.4572}
+    ],
+    _initialized:false
+  };
+  const mapTitleEl = document.getElementById('mapTitle');
+  mapTitleEl.textContent = `Active Branches - ${state.branches.length} Locations`;
+  const execsHost = document.getElementById('execs');
+  function metricBox(label, val){return `<div class="metric"><small>${label}</small><span class="num">${val}</span></div>`;}
+  function barColorFor(name){const root = getComputedStyle(document.documentElement);if (/AI Agent|AI/i.test(name)) return root.getPropertyValue('--ai').trim();if (/Brooke/i.test(name)) return root.getPropertyValue('--brooke').trim();return root.getPropertyValue('--accent').trim();}
+  
+ function renderExecs(){
+  if (!execsHost || !state || !Array.isArray(state.execs)) return;
+
+  execsHost.innerHTML = state.execs.map(e => {
+
+    const totalCalls = Number(e.totalCalls || 0);
+    let metricsHtml = '';
+    let metricsClass = 'metrics';
+    if (e.name === 'Jose Vargas') {
+
+      metricsHtml =
+        metricBox('Calls < 30 sec', e.callsNotConnected || 0) +
+        metricBox('Calls ≥ 30 sec', e.callsConnected || 0) +
+        metricBox('Presentations Scheduled', e.appointmentsSet || 0) +
+        metricBox('Calls Transferred', e.callsTransferred || 0) +
+        metricBox('Presentations Completed', e.presentationsCompletedToday || 0) +
+        metricBox('Contracts Sent', e.contractsSentToday || 0);
+
+    } else if (e.name === 'Eduardo Quesada') {
+
+      metricsHtml =
+        metricBox('Calls < 30 sec', e.callsNotConnected || 0) + metricBox('Calls ≥ 30 sec', e.callsConnected || 0) +metricBox('Presentations Scheduled', e.appointmentsSet || 0);
+
+    } else if (e.name === 'AI Agent') {
+
+      metricsHtml =
+        metricBox('Calls Made', totalCalls) +metricBox('Voicemails Dropped', e.voicemails || 0) + metricBox('Texts / SMS', e.textMessages || 0);
+    }
+    let badgeHtml = '';
+
+    if (
+      e.name === 'Jose Vargas' ||e.name === 'Eduardo Quesada' ||e.name === 'AI Agent'
+    ) {
+      badgeHtml = `<span class="badge">Total Calls: ${totalCalls}</span>`;
+    }
+    else if (e.name === 'Brooke Marin') {
+      const totalPres = e.presentationsCompletedWeekly || 0;
+      badgeHtml = `<span class="badge">Total Presentations: ${totalPres}</span>`;
+    }
+    const joseProgress = (e.name === 'Jose Vargas') ? (() => {
+      const callsGoal = JOSE_DAILY_CALL_GOAL;
+      const presGoal = JOSE_DAILY_PRES_GOAL;
+      const pres = e.appointmentsSet || 0;
+
+      const pCalls = callsGoal
+        ? Math.min(100, Math.round((totalCalls / callsGoal) * 100))
+        : 0;
+
+      const pPres = presGoal
+        ? Math.min(100, Math.round((pres / presGoal) * 100))
+        : 0;
+
+      return `
+        <div class="overallProgress"><div class="overallProgress-label"><span>Daily Calls Goal</span><span>${totalCalls} / ${callsGoal}</span></div><div class="overallProgress-bar"><span style="width:${pCalls}%"></span></div></div>
+ <div class="overallProgress"><div class="overallProgress-label"><span>Daily Presentations Goal</span><span>${pres} / ${presGoal}</span></div><div class="overallProgress-bar"><span style="width:${pPres}%"></span></div></div>`;
+    })() : '';
+
+    const eduardoProgress = (e.name === 'Eduardo Quesada') ? (() => {
+      const callsGoal = JOSE_DAILY_CALL_GOAL;
+      const presGoal = JOSE_DAILY_PRES_GOAL;
+      const pres = e.appointmentsSet || 0;
+
+      const pCalls = callsGoal
+        ? Math.min(100, Math.round((totalCalls / callsGoal) * 100))
+        : 0;
+
+      const pPres = presGoal
+        ? Math.min(100, Math.round((pres / presGoal) * 100))
+        : 0;
+
+      return `
+        <div class="overallProgress"><div class="overallProgress-label"><span>Daily Calls Goal</span><span>${totalCalls} / ${callsGoal}</span></div><div class="overallProgress-bar"><span style="width:${pCalls}%"></span></div></div><div class="overallProgress"><div class="overallProgress-label"><span>Daily Presentations Goal</span><span>${pres} / ${presGoal}</span></div><div class="overallProgress-bar"><span style="width:${pPres}%"></span></div></div>`;
+    })() : '';
+
+    return `
+      <div class="card exec"><div class="head"><div class="person"><span class="avatar">${e.avatar ? `<img src="${e.avatar}" alt="${e.name}">` : (e.initials || 'ST')}</span><strong>${e.name}</strong></div><div class="badges">${badgeHtml}</div></div><div class="${metricsClass}">${metricsHtml}</div>${joseProgress}${eduardoProgress}</div>
+    `;
+  }).join('');
+}
+
+  const mtdBars = document.getElementById('mtdBars');
+  function renderMonthly(){
+    const totalBranches = Number(state.month.mtdTotal||0);
+    const goal = state.month.targetGoal || 1;
+    const pctVal = Math.max(0, Math.min(100, Math.round((totalBranches/goal)*100)));
+    const breakdown = state.execs.filter(e => e.branchesSold > 0).map(e => `<div class="mini-bd-item"><div class="mini-bd-dot" style="background:${barColorFor(e.name)}"></div> ${e.branchesSold}</div>`).join('');
+    mtdBars.innerHTML = `<div class="bigBranches"><div class="bigBranches-num">${totalBranches}</div><div class="bigBranches-bar"><span style="width:${pctVal}%"></span></div><div class="mini-breakdown">${breakdown}</div></div>`;
+  }
+  const pieCharts = {};
+  function updatePieChart(id, current, goal, nameLabel){
+    if(!window.Chart) return;
+    const canvas = document.getElementById(id);
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const color = barColorFor(nameLabel || id);
+    const isAiQuantityChart = nameLabel === 'AI Agent' && !goal;
+    const safeGoal = isAiQuantityChart ? (current || 1) : (goal && goal > 0 ? goal : (current || 1));
+    const value = Math.max(0, current);
+    const remaining = isAiQuantityChart ? 0.001 : Math.max(0, safeGoal - value);
+    const data = [value, remaining];
+    if(pieCharts[id]){
+      pieCharts[id].data.datasets[0].data = data;
+      pieCharts[id].data.datasets[0].backgroundColor[1] = isAiQuantityChart ? color : '#e5e7eb';
+      pieCharts[id].update();
+    } else {
+      pieCharts[id] = new Chart(ctx, {
+        type:'doughnut',
+        data:{
+          labels:['Current','Remaining'],
+          datasets:[{data,backgroundColor:[color, isAiQuantityChart ? color : '#e5e7eb'],borderWidth:0}]
+        },
+        options:{
+          cutout:'62%',
+          plugins:{legend:{display:false}},
+          animation:{duration:400}
+        }
+      });
+    }
+  }
+  function renderWeekly(){
+    const daysInWeek = 5;
+    const jose = state.execs.find(e=>e.name==='Jose Vargas') || {};
+    const brooke = state.execs.find(e=>e.name==='Brooke Marin') || {};
+    const ai = state.execs.find(e=>e.name==='AI Agent') || {};
+
+    const joseCallsWeek = (jose.totalCalls||0) * daysInWeek;
+    const joseCallsGoalWeek = JOSE_DAILY_CALL_GOAL * daysInWeek;
+    const josePresWeek = (jose.appointmentsSet||0) * daysInWeek;
+    const josePresGoalWeek = JOSE_DAILY_PRES_GOAL * daysInWeek;
+    updatePieChart('joseCallsPie', joseCallsWeek, joseCallsGoalWeek, 'Jose Vargas');
+    updatePieChart('josePresPie', josePresWeek, josePresGoalWeek, 'Jose Vargas');
+
+    const brookePresWeek = brooke.presentationsCompletedWeekly || 0;
+    const brookePresGoalWeek = 25;
+    const brookeContractsWeek = brooke.contractsSentWeekly || 0;
+    const brookeContractsGoalWeek = 10;
+    const brookeBranchesWeek = brooke.branchesSold || 0;
+    const brookeBranchesGoalWeek = 3;
+    updatePieChart('brookePresPie', brookePresWeek, brookePresGoalWeek, 'Brooke Marin');
+    updatePieChart('brookeContractsPie', brookeContractsWeek, brookeContractsGoalWeek, 'Brooke Marin');
+    updatePieChart('brookeBranchesPie', brookeBranchesWeek, brookeBranchesGoalWeek, 'Brooke Marin');
+
+    const aiCallsWeek = (ai.totalCalls||0) * daysInWeek;
+    const aiVmWeek = (ai.voicemails||0) * daysInWeek;
+    const aiSmsWeek = (ai.textMessages||0) * daysInWeek;
+    updatePieChart('aiCallsPie', aiCallsWeek, null, 'AI Agent');
+    updatePieChart('aiVmPie', aiVmWeek, null, 'AI Agent');
+    updatePieChart('aiSmsPie', aiSmsWeek, null, 'AI Agent');
+  }
+  const noticesHost = document.getElementById('notices');
+  const noticesEmpty = document.getElementById('noticesEmpty');
+ function renderNotes() {
+    const safeFmt = (val) => {
+        const d = toDateOrNull(val);
+        if (d) {
+            return new Intl.DateTimeFormat([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(d);
+        }
+        return '';
+    };
+    const items = (state.notices || [])
+        .slice()
+        .sort((a, b) => {
+            const da = toDateOrNull(a.ts);
+            const db = toDateOrNull(b.ts);
+            if (da && db) return da - db;
+            return 0;
+        })
+        .slice(0, 40);
+    if (!items.length) {
+        noticesEmpty.style.display = 'block';
+        noticesHost.style.display = 'none';
+        return;
+    }
+
+    noticesEmpty.style.display = 'none';
+    noticesHost.style.display = 'flex';
+
+    noticesHost.innerHTML = items.map(n => {
+        const color = barColorFor(n.ae || '');
+
+        const typeLabel = `<span class="note-type">Presentation</span>`;
+        const aeLabel = n.ae ? `<span class="note-ae">${n.ae}</span>` : '';
+        const t = safeFmt(n.ts);
+
+        const nameHtml = n.email
+            ? `<a href="mailto:${n.email}" class="note-name">${n.name || ''}</a>`
+            : `<span class="note-name">${n.name || ''}</span>`;
+        const phoneHtml = n.phone
+            ? `<span class="note-phone">+${n.phone}</span>`
+            : '';
+        const datePresHtml = n.datePresentation
+            ? `<span class="note-date">📅 ${n.datePresentation}</span>`
+            : '';
+
+        const resultHtml = n.result
+            ? `<span class="note-result">${n.result}</span>`
+            : '';
+
+        return `
+            <div class="note" style="border-left-color:${color};">
+                📄
+                <div class="note-main">
+                    ${typeLabel}
+                    ${aeLabel ? `• ${aeLabel}` : ''}
+                    ${nameHtml}
+                    ${phoneHtml ? `• ${phoneHtml}` : ''}
+                    ${datePresHtml ? `• ${datePresHtml}` : ''}
+                    ${resultHtml ? `• ${resultHtml}` : ''}
+                </div>
+                <span class="ts">${t}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+let map, pinsLayer, pinMarkers=[];
+  function initLeaflet(){
+    if(map) return;
+    map = L.map('leafletMap', {zoomControl:false, attributionControl:false});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+    pinsLayer=L.layerGroup().addTo(map);
+    window.__EAST_BOUNDS = L.latLngBounds([24.0,-88.5],[42.5,-72.0]);
+    map.fitBounds(window.__EAST_BOUNDS,{padding:[10,10]});
+  }
+  function colorForPin(){const root = getComputedStyle(document.documentElement);return root.getPropertyValue('--accent').trim();}
+  function syncMap(){
+    if(!map) initLeaflet();
+    pinsLayer.clearLayers(); pinMarkers=[];
+    if(state.branches.length){
+      let bounds = null;
+      state.branches.forEach((b, idx)=>{
+        const color=colorForPin();
+        const m=L.circleMarker([b.lat,b.lng],{radius:6,color:'#fff',weight:2,fillColor:color,fillOpacity:0.85}).addTo(pinsLayer);
+        m.bindTooltip(`${b.city}, ${b.state}`, {permanent:false, direction:'top'});
+        pinMarkers[idx]=m;
+        const ll = L.latLng(b.lat,b.lng);
+        bounds = bounds ? bounds.extend(ll) : L.latLngBounds(ll,ll);
+      });
+      if(bounds){ map.fitBounds(bounds,{padding:[10,10]}); }
+    }else if(window.__EAST_BOUNDS){ map.fitBounds(window.__EAST_BOUNDS,{padding:[10,10]}); }
+    setTimeout(()=>{ if(map){ map.invalidateSize(); } }, 100);
+  }
+  const stageEl = document.getElementById('tickerStage');
+  const slideEl = document.getElementById('branchSlide');
+  let lastTs = null, tickerX = 0;
+  const TICKER_SPEED_PX_S = 95;
+  let blinkTimer = null, blinkUp = false, activePinIndex = -1;
+  function setActivePin(index){
+    if(blinkTimer){ clearInterval(blinkTimer); blinkTimer = null; }
+    pinMarkers.forEach((m)=>{ if(m){ m.setRadius(6); m.setStyle({fillOpacity:0.85}); } });
+    activePinIndex = index;
+    const m = pinMarkers[index]; if(!m) return;
+    blinkUp = false;
+    blinkTimer = setInterval(()=>{
+      blinkUp = !blinkUp;
+      if(!pinMarkers[activePinIndex]) return;
+      pinMarkers[activePinIndex].setRadius(blinkUp?7.4:6);
+      pinMarkers[activePinIndex].setStyle({fillOpacity: blinkUp? 0.98 : 0.75});
+    }, 900);
+  }
+  function currentBranchLabel(idx){const b = state.branches[idx % state.branches.length];return `${b.city}, ${b.state}`;}
+  function pickRandomBranchIndex(){if(!state.branches.length) return -1;if(state.branches.length === 1) return 0;const last = activePinIndex >=0 ? activePinIndex : 0;let idx = last, tries=0;while(idx === last && tries < 10){idx = Math.floor(Math.random()*state.branches.length);tries++;}return idx;}
+  function resetSlide(){
+    if(!stageEl || !slideEl) return;
+    const rect = stageEl.getBoundingClientRect();
+    const stageW = rect.width || stageEl.clientWidth || 300;
+    if(!state.branches.length){slideEl.textContent = 'No branches yet';tickerX = stageW;slideEl.style.transform = `translateX(${tickerX}px)`;lastTs = null;setActivePin(-1);return;}
+    const idx = pickRandomBranchIndex();
+    slideEl.textContent = currentBranchLabel(idx);
+    tickerX = stageW;
+    slideEl.style.transform = `translateX(${tickerX}px)`;
+    lastTs = null;
+    setActivePin(idx);
+  }
+  function tickTicker(ts){
+    if(lastTs==null){ lastTs = ts; requestAnimationFrame(tickTicker); return; }
+    const dt = (ts - lastTs)/1000; lastTs = ts;
+    tickerX -= TICKER_SPEED_PX_S * dt;
+    slideEl.style.transform = `translateX(${tickerX}px)`;
+    const slideW = slideEl.offsetWidth || 0;
+    if(tickerX + slideW <= 0){ resetSlide(); }
+    requestAnimationFrame(tickTicker);
+  }
+async function loadHumanCalls() {
+  const rows = await fetchSheetRows(SHEETS.joseCalls);
+
+  console.log('HUMAN ROWS RAW:', rows.length);
+  if (rows.length > 0) console.log('FIRST ROW:', rows[0]);
+
+  return rows
+    .map(r => {
+      const agent = (r.agente || '').trim();
+      const durationSec = Number(r.durationsec || 0);
+      const phone = r.phone || '';
+      let start = null;
+
+      if (r.startts) {
+        const val = r.startts.toString().trim();
+        if (!isNaN(Number(val))) {
+          // Número de Excel → convertir
+          start = new Date((Number(val) - 25569) * 86400 * 1000);
+        } else {
+          start = new Date(val.replace(' ', 'T'));
+        }
+        if (isNaN(start.getTime())) start = null;
+      }
+      return {
+        agent,
+        phone,
+        durationSec,
+        start: start ? start.toISOString() : ''
+      };
+    })
+    .filter(r => r.agent === 'Jose Vargas' || r.agent === 'Eduardo Quesada');
+}
+
+  async function loadAiCalls(){
+  const rows = await fetchSheetRows(SHEETS.aiCalls);
+
+  return rows.map(r => {
+    const agent  = r.agente || r.agent || r["Agente"] || "";
+    const rawStart = r.startts || r.starttime || r.start || r.ts || r.timestamp || "";
+    const durationSec = Number(r.durationsec || r.duration || r["DurationSec"] || 0);
+    const d = toDateOrNull(rawStart);
+
+    return {
+      agent,
+      durationSec,
+      start: d ? d.toISOString() : ""
+    };
+  });
+}
+async function countPresentationScheduled() {
+    const rows = await fetchSheetRows(SHEETS.pipeline);
+
+    let total = 0;
+
+    for (const r of rows) {
+        const ae = (r.ae || r.AE || "").trim().toLowerCase();
+        const stage = (r["Stage / Action"] || r.stage || "").trim().toLowerCase();
+        if (!ae || !stage) continue;
+        if (!ae.includes("jose")) continue;
+        if (stage.includes("presentation scheduled")) {
+            total++;
+        }
+    }
+    return total;
+}
+async function loadPipeline() {
+    const rows = await fetchSheetRows(SHEETS.pipeline);
+    state.notices = [];
+    state.execs.forEach(e => {
+        e.callsTransferred = 0;
+        e.appointmentsSet = 0;
+        e.presentationsCompletedToday = 0;
+        e.contractsSentToday = 0;
+    });
+
+    for (const r of rows) {
+        const ae = toCanonicalAgent(r.ae || "");
+        const stageNorm = String(r.stageaction || "").trim().toLowerCase();
+        const ex = state.execs.find(e => e.name === ae);
+        if (stageNorm === "presentation scheduled") {
+            if (ex) {
+                ex.appointmentsSet++;
+            }
+
+            state.notices.push({
+                type: "Presentation",
+                ae,
+                ts: r.timestamp || r.ts || r.start || r.startts || "",
+                name: r.name || r["Name"] || "",
+                email: r.email || r.Email || "",
+                phone: r.phone || r.Phone || "",
+                datePresentation:
+                    r.datepresentation ||
+                    r["Date Presentation"] ||
+                    r.date_presentation ||
+                    r.date ||
+                    ""
+            });
+        }
+        if (
+            stageNorm === "presentations completed" ||
+            stageNorm === "presentation completed"
+        ) {
+            const brooke = state.execs.find(e => e.name === "Jose Vargas");
+            if (brooke) {
+                brooke.presentationsCompletedToday++;
+            }
+        }
+        if (stageNorm === "contract sent" || stageNorm === "agreement sent") {
+            if (ex) {
+                ex.contractsSentToday++;
+            }
+        }
+        if (stageNorm === "call transfer" || stageNorm === "transfer") {
+            if (ex) {
+                ex.callsTransferred++;
+            }
+        }
+    }
+}
+
+  async function loadHistoryPipeline() {
+    const rows = await fetchSheetRows(SHEETS.historyPipeline);
+
+    state.execs.forEach(e => {
+        e.branchesSold = 0;
+        e.presentationsCompletedWeekly = 0;
+        e.contractsSentWeekly = 0;
+    });
+    const sentKeywords = ['contract sent', 'agreement sent', 'sent contract', 'sent agreement'];
+    const signedKeywords = ['contract signed', 'contract closed', 'sold', 'won', 'signed'];
+    const presCompletedKeywords = ['presentation completed', 'presentation done', 'completed presentation'];
+
+    for (const r of rows) {
+        const rawAe =
+            r.ae ||
+            r.agent ||
+            r.pipeline_owner ||
+            r.owner ||
+            r.rep ||
+            r.col1 ||
+            "";
+
+        const ae = toCanonicalAgent(String(rawAe).trim());
+        if (!ae) continue;
+
+        const ex = state.execs.find(e => e.name === ae);
+        if (!ex) continue;
+        const stageRaw =
+            r.stage ||
+            r.pipeline_stage ||
+            r.stage_action ||
+            r.status ||
+            r.col2 ||
+            "";
+
+        const stageNorm = String(stageRaw).trim().toLowerCase();
+        if (presCompletedKeywords.some(k => stageNorm.includes(k))) {
+            ex.presentationsCompletedWeekly++;
+        }
+        if (sentKeywords.some(k => stageNorm.includes(k))) {
+            ex.contractsSentWeekly++;
+        }
+        if (signedKeywords.some(k => stageNorm.includes(k))) {
+            ex.branchesSold++;
+        }
+    }
+    state.month.mtdTotal = state.execs.reduce((sum, ex) => sum + ex.branchesSold, 0);
+}
+  async function loadSMS(){
+    const rows = await fetchSheetRows(SHEETS.dailySMS);
+    let count = 0;
+    for(const r of rows){
+        const ts = toDateOrNull(r.time || r.timestamp || r.created || '');
+        if(!ts || (ts>=SOT && ts<EOT)){count++;}
+    }
+    const ai = state.execs.find(e=>e.name==='AI Agent');
+    if(ai) ai.textMessages = count;
+  }
+  async function refreshAll() {
+  const [humanRows,aiRows,smsRes,pipeRes,presScheduled, historyPipeRes] = await Promise.all([loadHumanCalls(),     loadAiCalls(),loadSMS(),loadPipeline(),countPresentationScheduled(),loadHistoryPipeline()]);
+
+  state.calls = [...humanRows, ...aiRows];
+  console.table(humanRows);
+
+  // Reset métricas
+  state.execs.forEach(e => {
+    if (e.name === 'Jose Vargas' || e.name === 'Eduardo Quesada') {
+      e.callsConnected = 0;
+      e.callsNotConnected = 0;
+      e.totalCalls = 0;
+      e.totalMin = 0;
+    }
+    if (e.name === 'AI Agent') {
+      e.totalCalls = 0;
+      e.voicemails = 0;
+      e.totalMin = 0;
+    }
+  });
+  for (const c of humanRows) {
+    const t = toDateOrNull(c.start);
+    if (!t || t < SOT || t >= EOT) continue;
+
+    const ex = state.execs.find(e => e.name === c.agent);
+    if (!ex) continue;
+
+    const s = c.durationSec || 0;
+    if (s >= 30) ex.callsConnected++;
+    else ex.callsNotConnected++;
+
+    ex.totalMin += (s / 60);
+    ex.totalCalls++;
+  }
+  for (const c of aiRows) {
+    const t = toDateOrNull(c.start);
+    if (!t || t < SOT || t >= EOT) continue;
+
+    const ex = state.execs.find(e => e.name === 'AI Agent');
+    if (!ex) continue;
+
+    ex.totalCalls++;
+    ex.totalMin += (c.durationSec / 60);
+  }
+  renderExecs();
+  renderMonthly();
+  renderWeekly();
+  renderNotes();
+  syncMap();
+  resetSlide();
+
+  if (!state._initialized) {
+    state.execs.forEach(ex => {
+      state.prev.presentations.set(ex.name, Number(ex.appointmentsSet || 0));
+      state.prev.sent.set(ex.name, Number(ex.contractsSentToday || 0));
+      state.prev.connections.set(ex.name, 0);
+    });
+    state._initialized = true;
+  }
+}
+
+  function showToast(title, subtitle=''){const t = document.getElementById('toast');t.innerHTML = subtitle ? `<strong>${title}</strong> &nbsp; <small>${subtitle}</small>` : `<strong>${title}</strong>`;t.style.display = 'block';clearTimeout(showToast._timer);showToast._timer = setTimeout(()=>{t.style.display='none';}, 5000);}
+  function celebrate(title, aeName='', durationMs=7500){
+    const overlay = document.getElementById('celebrate');
+    const canvas = document.getElementById('fwCanvas');
+    const fwTitle = document.getElementById('fwTitle');
+    const fwSub = document.getElementById('fwSub');
+    fwTitle.textContent = `🎉 ${title}`;
+    fwSub.textContent = aeName ? aeName : '';
+    showToast(title, aeName);
+    resizeCanvas();
+    overlay.classList.add('show');
+    let particles = [];
+    function rand(min,max){return Math.random()*(max-min)+min;}
+    function createBurst(x,y,count=80){for(let i=0;i<count;i++){particles.push({x,y,vx:rand(-3,3),vy:rand(-6,-2),g:0.08,life:rand(60,120),age:0,size:rand(2,4),alpha:1});}}
+    const bursts = 4;
+    for(let i=0;i<bursts;i++){const x = (i+1) * (canvas.width/(bursts+1));const y = canvas.height*0.35;createBurst(x,y,90);}
+    let fwRAF = null;
+    function step(){
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.age++;p.alpha = Math.max(0, 1 - p.age/p.life);ctx.globalAlpha = p.alpha;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='#ffcc00';ctx.fill();});
+      ctx.globalAlpha = 1;particles = particles.filter(p=>p.alpha>0.02);
+      if(particles.length>0) fwRAF = requestAnimationFrame(step);
+    }
+    if(fwRAF) cancelAnimationFrame(fwRAF);step();
+    setTimeout(()=>{overlay.classList.remove('show');particles = [];if(fwRAF) cancelAnimationFrame(fwRAF);canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);}, durationMs);
+  }
+  function triggerPresentationAlerts(){
+    if(state._initialized){
+      for(const ex of state.execs){
+        const cur = Number(ex.appointmentsSet||0);
+        const prev = Number(state.prev.presentations.get(ex.name)||0);
+        if(cur > prev){ showToast('Presentation Scheduled!', ex.name); }
+      }
+    }
+    for(const ex of state.execs){state.prev.presentations.set(ex.name, Number(ex.appointmentsSet||0));state.prev.sent.set(ex.name, Number(ex.contractsSentToday||0));}
+  }
+  const SNAP_KEY='um_dash_snaps_v1';
+  function getSnaps(){try{return JSON.parse(localStorage.getItem(SNAP_KEY)||'[]');}catch(e){return [];}}
+  function setSnaps(list){list.sort((a,b)=>b.date.localeCompare(a.date));const uniq=[];const seen=new Set();for(const s of list){if(seen.has(s.date)) continue;seen.add(s.date);uniq.push(s);if(uniq.length>=30) break;}localStorage.setItem(SNAP_KEY, JSON.stringify(uniq));}
+  function dateKey(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`;}
+  async function captureSnapshot(){try{const el = document.querySelector('.wrap');const snapCanvas = await html2canvas(el, {backgroundColor:'#ffffff',useCORS:true,scale:1,ignoreElements: (node)=> node && (node.id==='leafletMap')});const dataUrl = snapCanvas.toDataURL('image/jpeg', 0.85);const list = getSnaps();list.unshift({date: dateKey(), dataUrl});setSnaps(list);showToast('Daily Snapshot Saved', dateKey());}catch(e){}}
+  const histOverlay = document.getElementById('historyOverlay');
+  const histImg = document.getElementById('historyImage');
+  const histLabel = document.getElementById('historyLabel');
+  document.getElementById('historyCloseBtn').addEventListener('click', ()=> histOverlay.style.display='none');
+  let historyIndex = -1;
+  function showHistoryAt(i){const snaps = getSnaps();if(!snaps.length){showToast('No snapshots yet');return;}if(i<0) i = 0;if(i>=snaps.length) i = snaps.length-1;historyIndex = i;const shot = snaps[historyIndex];histImg.src = shot.dataUrl;histLabel.textContent = `Snapshot • ${shot.date} (${historyIndex+1}/${snaps.length})`;histOverlay.style.display = 'flex';}
+  function prevHistory(){const snaps = getSnaps();if(!snaps.length) return;if(historyIndex===-1){showHistoryAt(0);return;}showHistoryAt(Math.min(historyIndex+1, snaps.length-1));}
+  function nextHistory(){const snaps = getSnaps();if(!snaps.length) return;if(historyIndex<=0){histOverlay.style.display='none';historyIndex=-1;return;}showHistoryAt(historyIndex-1);}
+  document.getElementById('btnPrevDay').addEventListener('click', prevHistory);
+  document.getElementById('btnNextDay').addEventListener('click', nextHistory);
+  function startTicker(){resetSlide();requestAnimationFrame(tickTicker);}
+  (function(){initLeaflet();syncMap();})();
+  startTicker();
+  refreshAll();
+  const POLL_MS = 10000;
+  setInterval(refreshAll, POLL_MS);
+  const btnFull = document.getElementById('btnFull');
+  btnFull.addEventListener('click', async ()=>{const el = document.documentElement;if(!document.fullscreenElement){await el.requestFullscreen?.();btnFull.textContent='Exit Full Screen';} else {await document.exitFullscreen?.();btnFull.textContent='Full Screen';}setTimeout(()=>{if(window.map){map.invalidateSize();}}, 250);});
+  window.addEventListener('resize', ()=>{if(window.map){map.invalidateSize();}});
+  window.addEventListener('keydown', (ev)=>{if(ev.ctrlKey && ev.key.toLowerCase()==='s'){ev.preventDefault();captureSnapshot();}});
+</script>
+</body>
+</html>

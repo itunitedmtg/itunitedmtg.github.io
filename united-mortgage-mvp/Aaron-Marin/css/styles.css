@@ -1,0 +1,338 @@
+/* =========================
+   BASE / RESET
+========================= */
+:root{
+  --dark:#1a1a1a;
+  --light:#f5f7fa;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  background:#fff;
+  color:var(--dark);
+  line-height:1.6;
+}
+
+a{text-decoration:none; color:inherit;}
+
+/* =========================
+   CONTAINER
+========================= */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:0 20px;
+}
+
+/* =========================
+   HEADER
+========================= */
+header{
+  background:#fff;
+  border-bottom:1px solid #eee;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.header-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 0;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--dark);
+  font-weight:bold;
+}
+
+.logo img{height:40px;}
+
+nav a{
+  margin-left:20px;
+  color:var(--dark);
+  font-weight:500;
+}
+
+/* =========================
+   HERO
+========================= */
+.hero-lo{
+  background:#fff;  /* fondo blanco */
+  color:var(--dark);
+  padding:80px 0;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  align-items:center;
+}
+
+.hero-lo h1{
+  font-size:44px;
+  margin-bottom:10px;
+}
+
+.hero-lo h2{
+  font-size:20px;
+  font-weight:400;
+  margin-bottom:20px;
+}
+
+.hero-lo p{
+  font-size:18px;
+  margin-bottom:30px;
+}
+
+.hero-image img{
+  width:100%;
+  max-width:420px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+/* =========================
+   BOTONES
+========================= */
+.hero-actions {
+  display:flex;
+  gap:16px;
+  margin-top:20px;
+}
+
+.btn-primary,
+.btn-outline {
+  background-color: #000; /* negro */
+  color: #fff;            /* blanco */
+  padding: 14px 28px;
+  border-radius: 999px;   /* redondeado */
+  font-weight:600;
+  text-decoration:none;
+  display:inline-block;
+  border:none;
+  transition:0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-outline:hover {
+  background-color:#111;
+  transform: translateY(-2px);
+}
+
+/* =========================
+   TRUST BAR
+========================= */
+.trust-bar{
+  background:var(--light);
+  padding:30px 0;
+}
+
+.trust-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+  text-align:center;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+.section{
+  padding:70px 0;
+}
+
+.section.alt{
+  background:var(--light);
+}
+
+.section h2{
+  text-align:center;
+  font-size:32px;
+  margin-bottom:50px;
+}
+
+/* =========================
+   ABOUT
+========================= */
+.about-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:40px;
+}
+
+.about-cards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.about-card{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 5px 15px rgba(0,0,0,.08);
+  font-weight:bold;
+  text-align:center;
+}
+
+/* =========================
+   CARDS
+========================= */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:25px;
+}
+
+.card{
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+/* =========================
+   CTA
+========================= */
+.cta{
+  background:#000;
+  color:#fff;
+  text-align:center;
+  padding:70px 20px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer{
+  background:#1a1a1a;
+  color:#fff;
+  text-align:center;
+  padding:30px 20px;
+  font-size:14px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:900px){
+  .hero-grid,
+  .about-grid,
+  .cards,
+  .trust-grid{
+    grid-template-columns:1fr;
+  }
+
+  nav{display:none;}
+}
+/* ===============================
+   AARON MARIN – PAGE ANIMATIONS
+   Scoped & Independent
+================================ */
+
+/* Base reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(.4,0,.2,1),
+              transform 0.8s cubic-bezier(.4,0,.2,1);
+  will-change: opacity, transform;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* HERO stagger */
+.hero-lo .hero-content.reveal {
+  transition-delay: 0.15s;
+}
+
+.hero-lo .hero-image.reveal {
+  transition-delay: 0.3s;
+}
+
+/* TRUST BAR */
+.trust-bar .reveal {
+  transition-duration: 0.7s;
+}
+
+.trust-bar .reveal:nth-child(1) { transition-delay: 0.1s; }
+.trust-bar .reveal:nth-child(2) { transition-delay: 0.2s; }
+.trust-bar .reveal:nth-child(3) { transition-delay: 0.3s; }
+.trust-bar .reveal:nth-child(4) { transition-delay: 0.4s; }
+
+/* ABOUT CARDS */
+.about-card.reveal {
+  transition-duration: 0.6s;
+}
+
+.about-card.reveal:nth-child(1) { transition-delay: 0.1s; }
+.about-card.reveal:nth-child(2) { transition-delay: 0.2s; }
+.about-card.reveal:nth-child(3) { transition-delay: 0.3s; }
+.about-card.reveal:nth-child(4) { transition-delay: 0.4s; }
+
+/* APPROACH CARDS */
+.cards .card.reveal {
+  transition-duration: 0.7s;
+}
+
+.cards .card.reveal:nth-child(1) { transition-delay: 0.15s; }
+.cards .card.reveal:nth-child(2) { transition-delay: 0.3s; }
+.cards .card.reveal:nth-child(3) { transition-delay: 0.45s; }
+
+/* CTA emphasis */
+.cta.reveal {
+  transition-delay: 0.2s;
+}
+
+/* FOOTER */
+footer.reveal {
+  transition-delay: 0.15s;
+}
+
+/* Image polish */
+.hero-image img {
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.18);
+}
+
+/* Hover micro-interaction */
+.about-card,
+.cards .card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-card:hover,
+.cards .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.2);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .reveal {
+    transform: translateY(16px);
+    transition-duration: 0.6s;
+  }
+}
+body.aaron-page .reveal {
+  visibility: hidden;
+}
+
+body.aaron-page .reveal.active {
+  visibility: visible;
+}
