@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>United Mortgage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <img src="https://img1.wsimg.com/isteam/ip/f6bd757c-6ed2-4b2b-8d79-6a09da1f70a0/PNG.png" alt="United Mortgage">
+    <strong>United Mortgage</strong>
+  </div>
+  <nav>
+    <a href="#">Buy</a>
+    <a href="#">Refinance</a>
+    <a href="#">Rates</a>
+    <a href="branches.html">Branches</a>
+    <a href="https://unitedmtg.my1003app.com/register" class="apply-btn">Apply Now</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero-full">
+  <img src="assets/PASSIVE-HOUSE.jpeg" alt="Luxury Home" class="hero-img">
+
+  <div class="hero-overlay">
+    <span class="hero-tag">United Mortgage</span>
+    <h1>Confidence in Every Closing</h1>
+    <p>
+      At <strong>United Mortgage</strong>, we help you turn homeownership
+      into long-term financial confidence.
+    </p>
+    <a href="https://unitedmtg.my1003app.com/register" class="hero-btn">
+      Apply Now
+    </a>
+  </div>
+</section>
+
+
+<!-- GOALS -->
+<section class="section reveal">
+  <h2>What’s your goal?</h2>
+
+  <div class="goal-grid">
+    <div class="goal-card reveal-card" data-delay="0">
+      <div class="goal-icon">💰</div>
+      <h3>Turn equity into cash</h3>
+      <p>Use your home equity to access cash.</p>
+    </div>
+
+    <div class="goal-card reveal-card" data-delay="150">
+      <div class="goal-icon">🏡</div>
+      <h3>Buy a home and save</h3>
+      <p>Programs designed to lower payments.</p>
+    </div>
+
+    <div class="goal-card reveal-card" data-delay="300">
+      <div class="goal-icon">🔁</div>
+      <h3>Refinance with ease</h3>
+      <p>Simplify your mortgage.</p>
+    </div>
+
+    <div class="goal-card reveal-card" data-delay="450">
+      <div class="goal-icon">💳</div>
+      <h3>Pay off debt</h3>
+      <p>Consolidate monthly payments.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CARDS -->
+<section class="section reveal">
+  <h2>Start the new year with new ways to save</h2>
+
+  <div class="cards">
+    <div class="card">
+      <img src="assets/familihodernhouse.png" alt="">
+      <h3>Buy with Preferred Pricing</h3>
+    </div>
+
+    <div class="card">
+      <img src="https://images.pexels.com/photos/164558/pexels-photo-164558.jpeg" alt="">
+      <h3>Upgrade your mortgage</h3>
+    </div>
+
+    <div class="card">
+      <img src="https://images.pexels.com/photos/4968634/pexels-photo-4968634.jpeg" alt="">
+      <h3>Consolidate debt</h3>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="section alt reveal">
+  <h2>Mortgage calculator</h2>
+
+  <div class="calculator">
+    <div class="calc-grid">
+      <input id="price" placeholder="Home price">
+      <input id="down" placeholder="Down payment">
+      <input id="rate" placeholder="Interest rate %">
+      <input id="years" placeholder="Loan term (years)">
+    </div>
+
+    <div class="calc-result" id="result">$0 / month</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="reveal">
+  <div class="footer-grid">
+
+    <div>
+      <strong>United Mortgage of America, LLC</strong><br>
+      9820 Northcross Center Ct.<br>
+      Huntersville, NC 28078<br><br>
+      (800) 579-1622<br>
+      <a href="mailto:Info@UnitedMtg.net">Info@UnitedMtg.net</a>
+    </div>
+
+    <div class="company-links">
+      <strong>Company</strong><br>
+      <a href="/privacy-policy.html">Privacy Policy</a><br>
+      <a href="/legal-accessibility.html">Legal & Accessibility</a><br>
+      <a href="https://www.nmlsconsumeraccess.org/">NMLS Consumer Access</a>
+    </div>
+
+    <div>
+      <strong>Licensing</strong><br>
+      Licensed in NC, SC, GA & FL<br>
+      All Rights Reserved
+    </div>
+
+  </div>
+
+  <div class="social-links">
+    <a href="https://www.facebook.com/profile.php?id=61578362030401" target="_blank">
+      <i class="fa-brands fa-facebook-f"></i>
+    </a>
+    <a href="https://www.instagram.com/unitedmtge/" target="_blank">
+      <i class="fa-brands fa-instagram"></i>
+    </a>
+    <a href="https://x.com/Unitedmtge" target="_blank">
+      <i class="fa-brands fa-x-twitter"></i>
+    </a>
+    <a href="https://www.youtube.com/@UnitedMortgagemtge" target="_blank">
+      <i class="fa-brands fa-youtube"></i>
+    </a>
+  </div>
+
+  <div class="equal-housing">
+    <img
+      src="https://img1.wsimg.com/isteam/ip/f6bd757c-6ed2-4b2b-8d79-6a09da1f70a0/PNG.png"
+      alt="Equal Housing Opportunity">
+    <p>
+      Equal Housing Opportunity<br>
+      © 2025 United Mortgage of America, LLC - NMLS #2591834
+    </p>
+  </div>
+</footer>
+
+<!-- JS EXISTENTE -->
+<script>
+document.querySelectorAll('.calc-grid input').forEach(i => {
+  i.oninput = () => {
+    const p = +price.value - (+down.value || 0);
+    const r = (+rate.value || 0) / 100 / 12;
+    const n = (+years.value || 0) * 12;
+    if (p > 0 && r > 0 && n > 0) {
+      const m = p * (r * (1 + r) ** n) / ((1 + r) ** n - 1);
+      result.innerText = `$${m.toFixed(0)} / month`;
+    }
+  };
+});
+</script>
+
+<!-- JS ANIMACIONES -->
+<script>
+const revealSections = document.querySelectorAll('.reveal');
+
+function handleReveal() {
+  const windowHeight = window.innerHeight;
+  const trigger = 120;
+
+  revealSections.forEach(section => {
+    const top = section.getBoundingClientRect().top;
+
+    if (top < windowHeight - trigger) {
+      section.classList.add('active');
+
+      section.querySelectorAll('.reveal-card').forEach(card => {
+        const delay = card.dataset.delay || 0;
+        setTimeout(() => {
+          card.classList.add('active');
+        }, delay);
+      });
+    }
+  });
+}
+
+window.addEventListener('scroll', handleReveal);
+window.addEventListener('load', handleReveal);
+</script>
+
+</body>
+</html>
